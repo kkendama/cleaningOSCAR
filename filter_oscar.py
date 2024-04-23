@@ -25,7 +25,7 @@ def is_valid_text(args):
     text, ngwords = args
     text = unicodedata.normalize('NFKC', text)
     # 文字数 (400 文字未満)
-    if len(text) >= 400:
+    if len(text) <= 400:
         return False
 
     # 平仮名の文字の割合 (0.2 未満)
@@ -66,8 +66,12 @@ def is_valid_text(args):
         return False
 
     # Bunkaiを使用して文を分割
-    bunkai = Bunkai()
-    sentences = list(bunkai(text))
+    #bunkai = Bunkai()
+    #sentences = list(bunkai(text))
+    sentences = re.split(r'\n{1,}', text)
+    # sentenceを「。」「!」「?」「.」で分割
+    sentences = [re.split(r'([。！？\.]+)', sentence) for sentence in sentences]
+    sentences = [item for sublist in sentences for item in sublist if len(item)>1]
 
     # 文書中の文の文字数の平均 (20 未満，もしくは90 よりも多い場合)
     avg_sentence_length = sum(len(sentence) for sentence in sentences) / len(sentences)
